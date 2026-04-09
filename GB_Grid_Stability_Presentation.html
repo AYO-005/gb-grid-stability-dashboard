@@ -616,8 +616,8 @@ body{font-family:'Inter',sans-serif}
             <div id="dashboardQrFallback" class="qr-fallback" style="display:none">QR</div>
           </div>
           <div>
-            <a id="dashboardLink" class="dashboard-link" href="./index.html" target="_blank" rel="noopener">Open index dashboard</a>
-            <div class="dashboard-path" id="dashboardPath">./index.html</div>
+            <a id="dashboardLink" class="dashboard-link" href="https://ayo-005.github.io/gb-grid-stability-dashboard/" target="_blank" rel="noopener">Open live dashboard</a>
+            <div class="dashboard-path" id="dashboardPath">https://ayo-005.github.io/gb-grid-stability-dashboard/</div>
             <div class="dashboard-note">Same dashboard, same figures, same model logic. This is the live version used after the result overview.</div>
           </div>
         </div>
@@ -711,7 +711,7 @@ function setupDashboardAccess(){
   const qrFallback = document.getElementById('dashboardQrFallback');
   const pathLabel = document.getElementById('dashboardPath');
   const accessPanel = document.getElementById('dashboardAccess');
-  const dashboardUrl = new URL('./index.html', window.location.href).href;
+  const dashboardUrl = 'https://ayo-005.github.io/gb-grid-stability-dashboard/';
 
   if(link){
     link.href = dashboardUrl;
@@ -719,7 +719,7 @@ function setupDashboardAccess(){
   }
 
   if(pathLabel){
-    pathLabel.textContent = './index.html';
+    pathLabel.textContent = dashboardUrl;
   }
 
   if(qr){

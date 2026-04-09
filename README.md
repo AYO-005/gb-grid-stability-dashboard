@@ -6,7 +6,7 @@ This repository contains the final browser-based dashboard developed for the Kin
 
 The hosted dashboard is available on GitHub Pages:
 
-- Live link: `TO_BE_FILLED_AFTER_PUBLISH`
+- Live link: [https://ayo-005.github.io/gb-grid-stability-dashboard/](https://ayo-005.github.io/gb-grid-stability-dashboard/)
 
 ## Local files
 
