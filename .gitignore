@@ -1,0 +1,8 @@
+output/
+*.docx
+*.pdf
+*.pptx
+*.mp4
+*.tmp
+~$*
+*.log

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grid Stability Dashboard</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <p class="eyebrow">Individual Project</p>
+        <h1>Grid Stability Dashboard</h1>
+        <p class="brand-meta">King's College London - Anthony Yamin</p>
+        <p class="lede">
+          A single-area GB-equivalent simulator and interactive control room for testing
+          disturbance scenarios, service portfolios, imbalance dynamics, inertia effects,
+          protection cascades, and security margins.
+        </p>
+      </div>
+
+      <section class="control-panel">
+        <div class="panel-header">
+          <h2>Scenario Control</h2>
+        </div>
+
+        <div class="control-group">
+          <label for="scenarioPreset">Benchmark scenario</label>
+          <select id="scenarioPreset"></select>
+        </div>
+
+        <details class="control-section" open>
+          <summary>Operating Condition</summary>
+          <div class="control-grid">
+            <div class="control-group">
+              <label for="weather">Weather narrative (wind/solar split)</label>
+              <select id="weather">
+                <option value="calm">Calm</option>
+                <option value="sunny">Sunny</option>
+                <option value="windy">Windy</option>
+                <option value="gusty">Gusty</option>
+                <option value="storm_2019">Storm / 9 Aug 2019</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label for="demandGW">Demand base <span data-output="demandGW"></span></label>
+              <input id="demandGW" type="range" min="18" max="45" step="1">
+            </div>
+
+            <div class="control-group">
+              <label for="resShare">Renewable share of pre-fault generation <span data-output="resShare"></span></label>
+              <input id="resShare" type="range" min="0.10" max="0.95" step="0.01">
+            </div>
+
+            <div class="control-group">
+              <label for="importsMW">Base imports <span data-output="importsMW"></span></label>
+              <input id="importsMW" type="range" min="0" max="3000" step="50">
+            </div>
+
+            <div class="control-group">
+              <label for="systemStrength">System strength (operability layer) <span data-output="systemStrength"></span></label>
+              <input id="systemStrength" type="range" min="0.45" max="1.35" step="0.01">
+            </div>
+
+            <label class="toggle-row">
+              <input id="enableVoltageLayer" type="checkbox">
+              <span>Enable voltage and operability layer (activates system-strength effects)</span>
+            </label>
+          </div>
+          <div id="weatherSummary" class="inline-note"></div>
+        </details>
+
+        <details class="control-section" open>
+          <summary>Disturbance Event</summary>
+          <div class="control-grid">
+            <div class="control-group">
+              <label for="lossMW">Disturbance size <span data-output="lossMW"></span></label>
+              <input id="lossMW" type="range" min="500" max="3000" step="50">
+            </div>
+
+            <div class="control-group">
+              <label for="eventType">Disturbance type</label>
+              <select id="eventType">
+                <option value="step">Generator trip</option>
+                <option value="windStep">Wind output loss</option>
+                <option value="solarStep">Solar output loss</option>
+                <option value="aug2019">9 Aug 2019 scripted event</option>
+              </select>
+            </div>
+
+            <div class="control-group retired-control">
+              <label for="rampDuration">Ramp duration <span data-output="rampDuration"></span></label>
+              <input id="rampDuration" type="range" min="10" max="120" step="5">
+            </div>
+
+            <div class="control-group">
+              <label for="tFault">Event start <span data-output="tFault"></span></label>
+              <input id="tFault" type="range" min="5" max="40" step="1">
+            </div>
+
+            <label class="toggle-row">
+              <input id="enableLfdd" type="checkbox">
+              <span>Arm automatic low-frequency demand disconnection</span>
+            </label>
+
+            <div class="control-group">
+              <label for="lfddStage1MW">LFDD first-stage shed <span data-output="lfddStage1MW"></span></label>
+              <input id="lfddStage1MW" type="range" min="0" max="1500" step="25">
+            </div>
+
+            <label class="toggle-row">
+              <input id="enableVoltageRelief" type="checkbox">
+              <span>Arm Under-Voltage Emergency Relief</span>
+            </label>
+
+            <div class="control-group">
+              <label for="voltageReliefMW">Voltage-Relief Shed Block <span data-output="voltageReliefMW"></span></label>
+              <input id="voltageReliefMW" type="range" min="0" max="1500" step="25">
+            </div>
+
+            <label class="toggle-row">
+              <input id="enableReserveRelief" type="checkbox">
+              <span>Arm Reserve-Floor Emergency Relief</span>
+            </label>
+
+            <div class="control-group">
+              <label for="reserveReliefMW">Reserve-Relief Block <span data-output="reserveReliefMW"></span></label>
+              <input id="reserveReliefMW" type="range" min="0" max="1500" step="25">
+            </div>
+
+            <label class="toggle-row">
+              <input id="enableEmbeddedTrips" type="checkbox">
+              <span>Allow Adverse Follow-On Disturbance Loss</span>
+            </label>
+
+            <div class="control-group">
+              <label for="embeddedTripMW">Follow-On Disturbance Block <span data-output="embeddedTripMW"></span></label>
+              <input id="embeddedTripMW" type="range" min="0" max="600" step="25">
+            </div>
+          </div>
+          <div id="eventSummary" class="inline-note"></div>
+        </details>
+
+        <details class="control-section" open>
+          <summary>Services and Constraints</summary>
+          <div class="control-grid">
+            <div class="control-group">
+              <label for="portfolioPreset">Portfolio benchmark</label>
+              <select id="portfolioPreset"></select>
+            </div>
+
+            <label class="toggle-row">
+              <input id="useBess" type="checkbox">
+              <span>Enable Battery Support</span>
+            </label>
+
+            <div class="control-group">
+              <label for="bessMW">BESS power <span data-output="bessMW"></span></label>
+              <input id="bessMW" type="range" min="0" max="2000" step="50">
+            </div>
+
+            <div class="control-group">
+              <label for="bessMWh">BESS energy <span data-output="bessMWh"></span></label>
+              <input id="bessMWh" type="range" min="0" max="4000" step="25">
+            </div>
+
+            <div class="control-group">
+              <label for="bessSoC0">Initial SoC <span data-output="bessSoC0"></span></label>
+              <input id="bessSoC0" type="range" min="0.10" max="0.90" step="0.01">
+            </div>
+
+            <div class="control-group">
+              <label for="govMW">Governor Headroom <span data-output="govMW"></span></label>
+              <input id="govMW" type="range" min="0" max="2500" step="50">
+            </div>
+
+            <div class="control-group">
+              <label for="headroomPct">RES headroom <span data-output="headroomPct"></span></label>
+              <input id="headroomPct" type="range" min="0" max="0.15" step="0.005">
+            </div>
+
+            <div class="control-group">
+              <label for="drMW">Demand Response <span data-output="drMW"></span></label>
+              <input id="drMW" type="range" min="0" max="1500" step="50">
+            </div>
+
+            <label class="toggle-row">
+              <input id="useSyncon" type="checkbox">
+              <span>Enable Synchronous Condenser</span>
+            </label>
+
+            <div class="control-group">
+              <label for="synconH">SynCon inertia <span data-output="synconH"></span></label>
+              <input id="synconH" type="range" min="0" max="2.5" step="0.05">
+            </div>
+
+            <label class="toggle-row">
+              <input id="useGfm" type="checkbox">
+              <span>Enable Grid-Forming Support</span>
+            </label>
+
+            <div class="control-group">
+              <label for="gfmD">GFM damping <span data-output="gfmD"></span></label>
+              <input id="gfmD" type="range" min="0" max="1.2" step="0.05">
+            </div>
+
+            <label class="toggle-row">
+              <input id="useImportSupport" type="checkbox">
+              <span>Enable Import Response Support</span>
+            </label>
+
+            <div class="control-group">
+              <label for="importResponseMW">Import Response Support <span data-output="importResponseMW"></span></label>
+              <input id="importResponseMW" type="range" min="0" max="1200" step="50">
+            </div>
+          </div>
+          <div id="serviceSummary" class="inline-note"></div>
+        </details>
+
+        <details class="control-section">
+          <summary>Simulation Setup</summary>
+          <div class="control-grid">
+            <div class="control-group">
+              <label for="duration">Duration <span data-output="duration"></span></label>
+              <input id="duration" type="range" min="120" max="600" step="30">
+            </div>
+
+            <div class="control-group">
+              <label for="dt">Timestep <span data-output="dt"></span></label>
+              <input id="dt" type="range" min="0.02" max="0.10" step="0.01">
+            </div>
+          </div>
+          <div class="inline-note">Timestep controls the numerical resolution. Smaller values make the transient smoother and slower to compute; larger values run faster but can hide sub-second detail.</div>
+        </details>
+
+        <div class="legend-box">
+          <h3>Model Boundary</h3>
+          <p>
+            Frequency and energy balance are modelled explicitly. Voltage is a system-strength proxy for
+            operability context, not a full reactive-power or power-flow solution.
+          </p>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main-stage">
+      <section class="jump-panel player-bar">
+        <div class="jump-group">
+          <button id="setInputsButton" class="primary-button" type="button">Change Inputs</button>
+          <button id="playButton" type="button" class="jump-button">Run Scenario</button>
+          <button id="resetPlayback" type="button" class="jump-button">Reset to pre-fault</button>
+          <button id="milestonePrimary" type="button" class="jump-button">Fault</button>
+          <button id="milestoneSecondary" type="button" class="jump-button">Max RoCoF</button>
+          <button id="milestoneTertiary" type="button" class="jump-button">Nadir</button>
+          <span id="playStatePill" class="play-state">Locked</span>
+        </div>
+        <div class="player-track">
+          <input id="timelineScrubber" type="range" min="0" max="1000" step="1" value="0">
+          <div class="focus-readout" id="focusReadout">Focus: --</div>
+          <div id="focusMetrics" class="focus-metrics"></div>
+        </div>
+      </section>
+
+      <header class="hero-panel">
+        <div>
+          <p class="eyebrow">Frequency Stability and Resilience</p>
+          <h2 id="scenarioTitle">Loading scenario</h2>
+          <p id="scenarioSubtitle" class="subtitle"></p>
+          <div id="statusDefinition" class="hero-summary"></div>
+        </div>
+        <div class="status-cluster">
+          <div class="status-pill" id="statusPill">RUNNING</div>
+        </div>
+      </header>
+
+      <section class="kpi-grid" id="kpiGrid"></section>
+
+      <section class="panel summary-panel">
+        <div class="panel-head">
+          <h3>Operating Status and Protection Thresholds</h3>
+          <p>The overall case status prioritises frequency containment and recovery. Voltage operability and energy reserve are also tracked as separate constraint layers, so one weak metric can flag operability stress without automatically meaning a full frequency blackout.</p>
+        </div>
+        <div id="statusGuide" class="status-guide"></div>
+        <div id="limitRows" class="limit-stack limit-stack-top"></div>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel chart-panel span-2">
+          <div class="panel-head">
+            <h3>Frequency Response and Statutory Bands</h3>
+            <div class="chart-intro">
+              <div class="equation-row"><span class="equation">df/dt = (f<sub>0</sub> / 2H<sub>eff</sub>) [P<sub>imb</sub> - D<sub>eff</sub> (&Delta;f / f<sub>0</sub>)]</span></div>
+              <p class="chart-note">Tracks statutory frequency limits, RoCoF, nadir, and the return toward nominal frequency.</p>
+            </div>
+          </div>
+          <canvas id="frequencyChart" width="1200" height="420"></canvas>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h3>Power Balance and Services</h3>
+            <div class="chart-intro">
+              <div class="equation-row"><span class="equation">P<sub>imb</sub> = generation + services + imports - demand - disturbance</span></div>
+              <p class="chart-note">Shows how each service term offsets the disturbance and how protection actions change the net balance through time.</p>
+            </div>
+          </div>
+          <canvas id="powerChart" width="1200" height="420"></canvas>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h3>State of Charge and Voltage Resilience</h3>
+            <p>Tracks battery energy against the reserve floor and the system-strength voltage proxy against its warning band, using separate axes for clarity.</p>
+          </div>
+          <canvas id="stateChart" width="1200" height="420"></canvas>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h3>Live Causal Diagram</h3>
+            <p>Large live cards for the selected instant. Click a main time-series plot, or use the sticky playback bar, to follow the chain from imbalance to frequency and protection response.</p>
+          </div>
+          <div id="causalDiagram" class="diagram-grid"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h3>Weather and Renewable Mix</h3>
+            <p>Shows how the selected weather narrative redistributes the chosen renewable block between wind and solar in the locked operating point.</p>
+          </div>
+          <div id="mixSummary" class="mix-summary"></div>
+          <div class="subpanel-head cascade-head">
+            <h4>Protection Actions and Cascade Losses</h4>
+            <p>Shows triggered automatic protections such as LFDD or emergency relief, and separately shows any adverse follow-on disturbance losses. If none trigger, the panel stays quiet.</p>
+          </div>
+          <div id="cascadeSummary" class="cascade-summary"></div>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h3>Dynamic Security Margins</h3>
+              <p>Each core security metric is plotted in its own physical unit with secure, stressed, emergency, and blackout bands. Threshold values are listed under each panel so the trace stays readable.</p>
+          </div>
+          <div class="margin-grid">
+            <div class="margin-card">
+              <div class="margin-card-head">
+                <h4>Frequency Margin</h4>
+                <p>Frequency in Hz against the secure band above 49.5 Hz and the emergency floor at 48.8 Hz.</p>
+              </div>
+              <canvas id="marginFrequencyChart" width="580" height="250"></canvas>
+                <div class="margin-card-scale"><span>Blackout 48.6</span><span>Emergency 48.8</span><span>Secure 49.5+</span></div>
+            </div>
+            <div class="margin-card">
+              <div class="margin-card-head">
+                <h4>RoCoF Margin</h4>
+                <p>Absolute RoCoF in Hz/s against the planning band at 0.25, the stressed band at 0.50, and trip risk beyond 1.00.</p>
+              </div>
+              <canvas id="marginRoCoFChart" width="580" height="250"></canvas>
+              <div class="margin-card-scale"><span>Planning 0.25</span><span>Stressed 0.50</span><span>Trip 1.00</span></div>
+            </div>
+            <div class="margin-card">
+              <div class="margin-card-head">
+                <h4>Voltage Operability</h4>
+                <p>Voltage proxy in pu, showing weak-grid warning below 0.95 pu and hard operability stress below 0.92 pu.</p>
+              </div>
+              <canvas id="marginVoltageChart" width="580" height="250"></canvas>
+                <div class="margin-card-scale"><span>Emergency 0.92</span><span>Weak 0.95</span><span>Healthy &gt;0.95</span></div>
+            </div>
+            <div class="margin-card">
+              <div class="margin-card-head">
+                <h4>Energy Reserve</h4>
+                <p>Battery state of charge in percent, read against the healthy reserve band above 20% and the reserve floor at 10%.</p>
+              </div>
+              <canvas id="marginEnergyChart" width="580" height="250"></canvas>
+                <div class="margin-card-scale"><span>Emergency 10%</span><span>Healthy 20%</span><span>Reserve &gt;20%</span></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h3>Operating Map</h3>
+            <p>This map re-simulates the locked service fleet across renewable share and disturbance size using the current disturbance type. The exact locked case is inserted into the sweep axes, so the highlighted cell matches the same case shown in the main plots and thresholds.</p>
+          </div>
+          <canvas id="heatmapChart" width="1200" height="420"></canvas>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h3>Sensitivity Tornado</h3>
+            <p>The centre line is the locked base case. The left bar tests a lower setting and the right bar tests a higher setting; green lifts the nadir, while red deepens it and weakens the margin.</p>
+          </div>
+          <canvas id="sensitivityChart" width="1200" height="360"></canvas>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h3>Control Room Briefing</h3>
+            <p>Short operator notes on what happened in this locked run: frequency behaviour, power and energy balance, voltage operability, protection response, and resilience outcome.</p>
+          </div>
+          <div id="insightList" class="insight-list"></div>
+        </article>
+
+        <article class="panel span-2">
+          <div class="panel-head">
+            <h3>Dynamic Relationships</h3>
+            <p>Explains why the locked case behaves the way it does by linking the governing equations to the active services, Voltage Proxy, Battery Power and Energy, and protection actions. This section complements the Control Room Briefing by focusing on the cause-and-effect relationships behind the result.</p>
+          </div>
+          <div id="relationshipList" class="relationship-grid"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+    <script src="./model.js?v=20260408g"></script>
+    <script src="./app.js?v=20260408g"></script>
+  </body>
+</html>
